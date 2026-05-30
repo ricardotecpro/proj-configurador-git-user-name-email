@@ -22,6 +22,51 @@ O script interativo oferece 5 opções principais em um painel colorido no termi
 *   **3. Como Fazer Login/Autenticar no GitHub:** Um pequeno guia em texto explicando a autenticação por HTTPS moderno. Ensina o aluno que ele não deve digitar a senha do GitHub no terminal, mas sim clicar no botão azul de autenticação que abrirá no navegador de forma totalmente automatizada.
 *   **4. Guia Rápido de Comandos Básicos (Cola):** Uma folha de dicas ("cheat sheet") rápida que os alunos podem consultar diretamente no terminal com os principais comandos utilizados no dia a dia (`git init`, `git clone`, `git status`, `git add`, `git commit`, `git push`, `git pull`).
 *   **5. Limpar Minhas Credenciais (LOGOUT - Segurança! 🔒):** A função mais crítica para laboratórios compartilhados. Ela remove de forma robusta e limpa todas as chaves de acesso salvas no Windows Credential Manager (`cmdkey`) e desconfigura o nome/e-mail globais do Git. Assim, o próximo aluno da próxima aula não terá acesso às chaves de segurança nem enviará códigos fingindo ser outra pessoa.
+---
+
+## 📊 Fluxograma de Funcionamento
+
+O diagrama abaixo ilustra o fluxo completo do script `configurar-git.ps1`, incluindo as validações e as ações executadas por cada opção do menu interativo:
+
+```mermaid
+graph TD
+    Start([Início]) --> CheckGit{Git instalado?}
+    
+    CheckGit -- Não --> ErrorGit[Exibe erro vermelho<br>Indica site de download] --> ExitGit([Fim do Script])
+    
+    CheckGit -- Sim --> MainMenu[Carrega Menu Principal]
+    
+    MainMenu --> ShowStatus[Exibe Status Atual<br>CONFIGURADO ou NÃO CONFIGURADO]
+    ShowStatus --> ShowOptions[Exibe Opções 1 a 6]
+    ShowOptions --> UserChoice{Escolha do Usuário}
+    
+    UserChoice -- 1. Configurar Git --> Opt1[Solicita Nome Completo]
+    Opt1 --> ValidateName{Nome & Sobrenome?}
+    ValidateName -- Não --> WarnName[Aviso pedagógico<br>Confirmar mesmo assim?]
+    ValidateName -- Sim --> AskEmail[Solicita E-mail GitHub]
+    WarnName -- Sim --> AskEmail
+    WarnName -- Não --> Opt1
+    AskEmail --> ValidateEmail{E-mail válido?}
+    ValidateEmail -- Não --> ErrEmail[Aviso: E-mail inválido] --> AskEmail
+    ValidateEmail -- Sim --> ConfirmData{Salvar configurações?}
+    ConfirmData -- Sim --> SaveGit[git config --global user.name / user.email<br>Branch padrão: main<br>Credential helper: manager] --> BackMenu
+    ConfirmData -- Não --> CancelGit[Configuração Cancelada] --> BackMenu
+    
+    UserChoice -- 2. Verificar Configuração --> Opt2[Mostra user.name e user.email<br>Lista todas configs globais] --> BackMenu
+    
+    UserChoice -- 3. Como Autenticar --> Opt3[Guia de Login via Browser HTTPS<br>Explica Credential Manager] --> BackMenu
+    
+    UserChoice -- 4. Cola de Comandos --> Opt4[Exibe Cheat Sheet de Comandos<br>git init, clone, status, add, commit, push, pull] --> BackMenu
+    
+    UserChoice -- 5. Limpar Credenciais --> Opt5{Confirmar Limpeza?}
+    Opt5 -- Sim --> CleanGit[1. git credential reject<br>2. Deleta chaves do cmdkey Windows<br>3. git config --global --unset] --> SuccessClean[Exibe mensagem de sucesso] --> BackMenu
+    Opt5 -- Não --> CancelClean[Limpeza Cancelada] --> BackMenu
+    
+    UserChoice -- 6. Sair --> ExitScript([Fim do Script])
+    UserChoice -- Inválido --> ErrOpt[Opção Inválida<br>Aguardar 1s] --> MainMenu
+    
+    BackMenu[Pressione qualquer tecla] --> MainMenu
+```
 
 ---
 

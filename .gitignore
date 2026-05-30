@@ -1,0 +1,22 @@
+# Windows system files
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Editors and IDEs
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.swp
+
+# PowerShell & terminal session logs/history
+.history/
+*.log
+*.tmp
+
+# Tooling / Agent specific directories
+.antigravitycli/
